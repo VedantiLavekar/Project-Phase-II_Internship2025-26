@@ -20,13 +20,11 @@ import re
 # =========================
 # AI CONFIG
 # =========================
-
-OPENROUTER_API_KEY = "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"
-
+OPENROUTER_API_KEY = "YOUR_OPENROUTER_API_KEY"
 # =========================
 # TELEGRAM CONFIG
 # =========================
-BOT_TOKEN = "8386672558:AAEePUYseuV7SftQkw50VYhtQY2gsH_f5Ks"
+BOT_TOKEN = "YOUR_TELEGRAM_BOT_TOKEN"
 CHAT_ID = "2044709883"
 
 # =========================
