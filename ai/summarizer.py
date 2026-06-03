@@ -1,7 +1,7 @@
 import requests
 import re
 
-API_KEY = "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"
+OPENROUTER_API_KEY = "YOUR_OPENROUTER_API_KEY"
 
 
 def summarize_text(text):
