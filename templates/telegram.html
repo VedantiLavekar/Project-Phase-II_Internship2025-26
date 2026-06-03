@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Telegram Voice Message</title>
+
+<style>
+
+body{
+    font-family:Arial;
+    background:#f4f6fb;
+    padding:40px;
+}
+
+.container{
+    max-width:700px;
+    margin:auto;
+    background:white;
+    padding:30px;
+    border-radius:10px;
+}
+
+textarea{
+    width:100%;
+    height:150px;
+    padding:15px;
+    font-size:18px;
+}
+
+.status{
+    margin-top:20px;
+    font-weight:bold;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>📩 Telegram Voice Message</h2>
+
+<textarea id="msg"></textarea>
+
+<div class="status" id="status"></div>
+
+</div>
+
+<script>
+
+let isSpeaking = false;
+
+/* ================= SPEAK ================= */
+
+function speak(text, cb){
+
+    isSpeaking = true;
+
+    try{
+        recognition.abort();
+    }catch(e){}
+
+    speechSynthesis.cancel();
+
+    const utter =
+        new SpeechSynthesisUtterance(text);
+
+    utter.lang = "en-IN";
+
+    utter.rate = 1;
+
+    utter.onstart = ()=>{
+
+        document.getElementById("status").innerText =
+            text;
+    };
+
+    utter.onend = ()=>{
+
+        isSpeaking = false;
+
+        setTimeout(()=>{
+
+            if(cb) cb();
+
+        },2000);
+    };
+
+    speechSynthesis.speak(utter);
+}
+
+/* ================= RECOGNITION ================= */
+
+const SpeechRecognition =
+window.SpeechRecognition ||
+window.webkitSpeechRecognition;
+
+const recognition =
+new SpeechRecognition();
+
+recognition.lang = "en-IN";
+
+recognition.continuous = true;
+
+recognition.interimResults = false;
+
+recognition.maxAlternatives = 1;
+
+/* ================= STATE ================= */
+
+let step = "message";
+
+/* ================= LISTEN ================= */
+
+function listen(){
+
+    if(isSpeaking) return;
+
+    document.getElementById("status").innerText =
+        "Listening...";
+
+    try{
+
+        recognition.abort();
+
+    }catch(e){}
+
+    setTimeout(()=>{
+
+        console.log(
+            "MIC STARTED WAITING FOR USER"
+        );
+
+        recognition.start();
+
+    },1500);
+}
+
+/* ================= PAGE LOAD ================= */
+
+window.onload = async ()=>{
+
+    try{
+
+        await navigator.mediaDevices.getUserMedia({
+
+            audio:true
+
+        });
+
+    }catch(e){
+
+        alert(
+            "Please allow microphone permission"
+        );
+
+        return;
+    }
+
+    speak(
+
+        "Tell telegram message",
+
+        ()=>{
+
+            listen();
+
+        }
+
+    );
+};
+
+/* ================= RESULT ================= */
+
+recognition.onresult = async(event)=>{
+
+    recognition.abort();
+
+    const text =
+        event.results[0][0].transcript
+        .toLowerCase()
+        .trim();
+
+    console.log(
+        "USER SAID:",
+        text
+    );
+
+    document.getElementById("status").innerText =
+        "You said: " + text;
+
+    /* ================= CANCEL ================= */
+
+    if(text.includes("cancel")){
+
+        speak(
+
+            "Telegram cancelled returning dashboard",
+
+            ()=>{
+
+                window.location.href =
+                    "/dashboard";
+
+            }
+
+        );
+
+        return;
+    }
+
+    /* ================= MESSAGE STEP ================= */
+
+    if(step==="message"){
+
+        document.getElementById("msg").value =
+            text;
+
+        step = "confirm";
+
+        speak(
+
+            "Do you want to send telegram message say yes or cancel",
+
+            ()=>{
+
+                listen();
+
+            }
+
+        );
+
+        return;
+    }
+
+    /* ================= CONFIRM STEP ================= */
+
+    if(step==="confirm"){
+
+        recognition.abort();
+
+        console.log(
+            "CONFIRM TEXT:",
+            text
+        );
+
+        document.getElementById("status").innerText =
+            "Confirmation: " + text;
+
+        if(
+
+            text.trim() === "yes"
+
+            ||
+
+            text.includes("yes")
+
+            ||
+
+            text.includes("send")
+
+            ||
+
+            text.includes("okay")
+
+        ){
+
+            try{
+
+                document.getElementById("status").innerText =
+                    "Sending telegram message...";
+
+                const response =
+                    await fetch(
+
+                        "/send-telegram",
+
+                        {
+
+                            method:"POST",
+
+                            headers:{
+
+                                "Content-Type":"application/json"
+
+                            },
+
+                            body:JSON.stringify({
+
+                                message:
+
+                                document.getElementById("msg").value
+
+                            })
+
+                        }
+
+                    );
+
+                const result =
+                    await response.json();
+
+                console.log(
+                    "SEND RESULT:",
+                    result
+                );
+
+                speak(
+
+                    "Telegram message sent successfully",
+
+                    ()=>{
+
+                        window.location.href =
+                            "/dashboard";
+
+                    }
+
+                );
+
+            }catch(e){
+
+                console.log(
+                    "SEND ERROR:",
+                    e
+                );
+
+                speak(
+                    "Failed to send telegram message"
+                );
+            }
+
+        }else{
+
+            speak(
+
+                "Telegram cancelled",
+
+                ()=>{
+
+                    window.location.href =
+                        "/dashboard";
+
+                }
+
+            );
+        }
+    }
+};
+
+/* ================= ERRORS ================= */
+
+recognition.onerror = (event)=>{
+
+    console.log(
+        "Speech Error:",
+        event.error
+    );
+
+    if(event.error !== "aborted"){
+
+        setTimeout(()=>{
+
+            listen();
+
+        },1000);
+    }
+};
+
+recognition.onstart = ()=>{
+
+    console.log("Microphone ON");
+
+    document.getElementById("status").innerText =
+        "Listening...";
+};
+
+recognition.onend = ()=>{
+
+    console.log("Microphone OFF");
+};
+
+</script>
+
+</body>
+</html>

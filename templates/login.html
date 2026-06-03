@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Voice Gmail Assistant - Login</title>
+  <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+
+<body class="auth-page">
+
+<div class="auth-card">
+  <h2>🎙 Voice Gmail Assistant</h2>
+
+  <p id="statusMsg"
+     style="margin:10px 0; color:#38bdf8;">
+  </p>
+
+  <button id="googleLoginBtn"
+          class="google-btn"
+          onclick="window.location.href='/login/google'">
+
+    🔐 Login with Google
+
+  </button>
+
+  <video id="video"
+         width="260"
+         height="200"
+         autoplay
+         playsinline
+
+         style="
+         display:none;
+         margin-top:10px;
+         border-radius:10px;">
+
+  </video>
+
+  <canvas id="canvas"
+          width="260"
+          height="200"
+
+          style="display:none;">
+
+  </canvas>
+
+  <button class="primary-btn"
+          onclick="loginWithPassword()">
+
+    Login
+
+  </button>
+
+  <button class="secondary"
+          onclick="location.href='/register'">
+
+    Register
+
+  </button>
+
+</div>
+
+<script>
+
+/* ================= GLOBAL ================= */
+
+let state = "idle";
+
+let tempEmail = "";
+
+let tempImage = "";
+
+let isSpeaking = false;
+
+let ignoreCommands = false;
+
+let isListeningMode = false;
+
+
+/* ================= UI ================= */
+
+function showMsg(
+  msg,
+  color="#38bdf8"
+) {
+
+  statusMsg.innerText = msg;
+
+  statusMsg.style.color = color;
+}
+
+
+/* ================= SPEAK ================= */
+
+function speak(
+  text,
+  cb
+) {
+
+  isSpeaking = true;
+
+  ignoreCommands = true;
+
+  speechSynthesis.cancel();
+
+  const u =
+    new SpeechSynthesisUtterance(
+      text
+    );
+
+  u.lang = "en-IN";
+
+  u.rate = 1;
+
+  u.pitch = 1;
+
+  u.volume = 1;
+
+  u.onend = () => {
+
+    isSpeaking = false;
+
+    setTimeout(() => {
+
+      ignoreCommands = false;
+
+    }, 4000);
+
+    if (cb)
+      cb();
+  };
+
+  speechSynthesis.speak(u);
+
+  showMsg(text);
+}
+
+
+/* ================= VOICE HANDLER ================= */
+
+function handleVoice(text) {
+
+  text =
+    text
+      .toLowerCase()
+      .trim();
+
+  console.log(
+    "VOICE:",
+    text
+  );
+
+  /* ---------- GOOGLE LOGIN ---------- */
+
+  if (
+
+    text.includes(
+      "login with google"
+    ) ||
+
+    text.includes(
+      "google login"
+    )
+
+  ) {
+
+    speak(
+
+      "Opening Google login",
+
+      () => {
+
+        window.location.href =
+          "/login/google";
+      }
+    );
+
+    return;
+  }
+
+  /* ---------- REGISTER ---------- */
+
+  if (
+    state === "idle"
+  ) {
+
+    if (
+      text.includes(
+        "register"
+      )
+    ) {
+
+      state =
+        "reg_email";
+
+      speak(
+        "Please say your email id"
+      );
+
+      return;
+    }
+
+    if (
+      text.includes(
+        "login"
+      )
+    ) {
+
+      state =
+        "login_face";
+
+      speak(
+        "Look at the camera",
+
+        captureFace
+      );
+
+      return;
+    }
+
+    speak(
+      "Say login register or login with google"
+    );
+
+    return;
+  }
+
+  /* ---------- REGISTER EMAIL ---------- */
+
+  if (
+    state === "reg_email"
+  ) {
+
+    tempEmail =
+      text
+        .replace(/\s+/g,"")
+        .replace("at","@")
+        .replace("dot",".");
+
+    state =
+      "reg_email_confirm";
+
+    speak(
+      "Is this email correct? Say yes or no"
+    );
+
+    return;
+  }
+
+  /* ---------- EMAIL CONFIRM ---------- */
+
+  if (
+    state ===
+    "reg_email_confirm"
+  ) {
+
+    if (
+      text.includes(
+        "yes"
+      )
+    ) {
+
+      state =
+        "reg_face";
+
+      speak(
+        "Look at the camera",
+
+        captureFace
+      );
+
+      return;
+    }
+
+    if (
+      text.includes(
+        "no"
+      )
+    ) {
+
+      state =
+        "reg_email";
+
+      speak(
+        "Please say the email again"
+      );
+
+      return;
+    }
+
+    speak(
+      "Please say yes or no"
+    );
+
+    return;
+  }
+
+  /* ---------- REGISTER PIN ---------- */
+
+  if (
+    state === "reg_pin"
+  ) {
+
+    const pin =
+      text
+        .replace(/\D/g,"")
+        .slice(0,4);
+
+    fetch(
+      "/api/voice-register",
+      {
+
+        method: "POST",
+
+        headers: {
+          "Content-Type":
+            "application/json"
+        },
+
+        body:
+          JSON.stringify(
+            {
+              email:
+                tempEmail,
+
+              password:
+                "voice",
+
+              pin:
+                pin
+            }
+          )
+      }
+    )
+
+    .then(r => r.json())
+
+    .then(d => {
+
+      showMsg(
+        d.message,
+
+        d.success
+          ? "lightgreen"
+          : "red"
+      );
+
+      speak(
+        d.message
+      );
+
+      state = "idle";
+    });
+
+    return;
+  }
+
+  /* ---------- LOGIN PIN ---------- */
+
+  if (
+    state === "login_pin"
+  ) {
+
+    const pin =
+      text
+        .replace(/\D/g,"")
+        .slice(0,4);
+
+    fetch(
+      "/api/face-pin-login",
+      {
+
+        method: "POST",
+
+        headers: {
+          "Content-Type":
+            "application/json"
+        },
+
+        body:
+          JSON.stringify(
+            {
+              pin:
+                pin,
+
+              image:
+                tempImage
+            }
+          )
+      }
+    )
+
+    .then(res => res.json())
+
+    .then(data => {
+
+      console.log(
+        "LOGIN:",
+        data
+      );
+
+      if (
+        data.success
+      ) {
+
+        window.location.href =
+          data.redirect;
+      }
+
+      else {
+
+        speak(
+          data.message
+        );
+      }
+    })
+
+    .catch(() => {
+
+      speak(
+        "Login failed. Please try again."
+      );
+    });
+
+    return;
+  }
+}
+
+
+/* ================= CAMERA ================= */
+
+function captureFace() {
+
+  navigator.mediaDevices
+    .getUserMedia(
+      {
+        video:true
+      }
+    )
+
+    .then(stream => {
+
+      video.srcObject =
+        stream;
+
+      video.style.display =
+        "block";
+
+      setTimeout(() => {
+
+        canvas
+          .getContext("2d")
+          .drawImage(
+            video,
+            0,
+            0,
+            260,
+            200
+          );
+
+        tempImage =
+          canvas.toDataURL(
+            "image/jpeg"
+          );
+
+        stream
+          .getTracks()
+          .forEach(
+            t => t.stop()
+          );
+
+        video.style.display =
+          "none";
+
+        if (
+          state ===
+          "login_face"
+        ) {
+
+          state =
+            "login_pin";
+
+          speak(
+            "Say your four digit pin"
+          );
+        }
+
+        if (
+          state ===
+          "reg_face"
+        ) {
+
+          state =
+            "reg_pin";
+
+          speak(
+            "Say your four digit pin"
+          );
+        }
+
+      }, 2000);
+    });
+}
+
+
+/* ================= VOSK LISTENER ================= */
+
+setInterval(async () => {
+
+  try {
+
+    if (
+      isSpeaking ||
+      ignoreCommands
+    ) {
+      return;
+    }
+
+    const res =
+      await fetch(
+        "/get-command"
+      );
+
+    const data =
+      await res.json();
+
+    if (
+      data.command
+    ) {
+
+      const cmd =
+        data.command
+          .toLowerCase()
+          .trim();
+
+      console.log(
+        "LOGIN CMD:",
+        cmd
+      );
+
+      /* ---------- START ---------- */
+
+      if (
+        !isListeningMode &&
+        (
+          cmd.includes("hello") ||
+          cmd.includes("hello assistant")
+        )
+      ) {
+
+        isListeningMode =
+          true;
+
+        speak(
+          "I am listening. You can give commands."
+        );
+
+        return;
+      }
+
+      /* ---------- STOP ---------- */
+
+      if (
+        cmd.includes("stop")
+      ) {
+
+        isListeningMode =
+          false;
+
+        speak(
+          "Voice assistant stopped."
+        );
+
+        return;
+      }
+
+      /* ---------- IGNORE ---------- */
+
+      if (
+        !isListeningMode
+      ) {
+        return;
+      }
+
+      handleVoice(cmd);
+    }
+
+  } catch(e) {
+
+    console.log(e);
+  }
+
+}, 500);
+
+
+/* ================= INIT ================= */
+
+window.onload = () => {
+
+  speak(
+    "Say hello to activate voice assistant"
+  );
+};
+
+</script>
+
+</body>
+</html>

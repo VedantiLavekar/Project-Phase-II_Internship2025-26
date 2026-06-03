@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>Voice Email Assistant - Dashboard</title>
+
+    <link rel="stylesheet" href="/static/css/dashboard.css">
+
+    <style>
+
+        #helpPopup {
+
+            position: fixed;
+
+            top: 50%;
+
+            left: 50%;
+
+            transform: translate(-50%, -50%);
+
+            background: #1e1e2f;
+
+            color: white;
+
+            padding: 20px;
+
+            border-radius: 12px;
+
+            width: 320px;
+
+            max-height: 80vh;
+
+            overflow-y: auto;
+
+            box-shadow: 0 0 25px rgba(0,0,0,0.6);
+
+            display: none;
+
+            z-index: 9999;
+
+        }
+
+        #helpPopup h3 {
+
+            margin-top: 0;
+
+            color: #00d4ff;
+
+        }
+
+        #helpPopup div {
+
+            margin-bottom: 8px;
+
+            padding: 5px;
+
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+
+        }
+
+        #closeHelp {
+
+            position: absolute;
+
+            top: 10px;
+
+            right: 15px;
+
+            cursor: pointer;
+
+            color: red;
+
+            font-weight: bold;
+
+        }
+
+        #voiceStatus {
+
+            color: lime;
+
+            font-weight: bold;
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="dashboard-container">
+
+    <!-- SIDEBAR -->
+
+    <div class="sidebar">
+
+        <h2>🎙 Voice Assistant</h2>
+
+        <button onclick="fetchFolder('inbox')">
+            Inbox
+        </button>
+
+        <button onclick="fetchFolder('sent')">
+            Sent
+        </button>
+
+        <button onclick="fetchFolder('trash')">
+            Trash
+        </button>
+
+        <button onclick="window.location.href='/voice-mail'">   
+            Compose
+        </button>
+
+        <button onclick="window.location.href='/logout'">
+            Logout
+        </button>
+
+    </div>
+
+    <!-- MAIN CONTENT -->
+
+    <div class="main-content">
+
+        <!-- VOICE CARD -->
+
+        <div class="voice-card">
+
+            <h3>🎤 Voice Assistant</h3>
+
+            <div class="box">
+
+                <strong>Status:</strong>
+
+                <span id="voiceStatus">
+                    Listening
+                </span>
+
+            </div>
+
+            <div class="box">
+
+                <strong>Recognized:</strong>
+
+                <span id="recognizedText">
+                    —
+                </span>
+
+            </div>
+
+            <div class="box">
+
+                <strong>Assistant:</strong>
+
+                <span id="assistantText">
+                    Say a command
+                </span>
+
+            </div>
+
+        </div>
+
+        <!-- CONTENT PANEL -->
+
+        <div class="content-panel">
+
+            <h3 id="sectionTitle">
+                Inbox
+            </h3>
+
+            <div id="sectionContent" class="empty-state">
+
+                No emails loaded
+
+            </div>
+
+            <button onclick="document.getElementById('helpPopup').style.display='block'">
+                🎤 Help Commands
+            </button>
+
+            <div id="telegramBox"></div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- HELP POPUP -->
+
+<div id="helpPopup">
+
+    <span
+        id="closeHelp"
+        onclick="document.getElementById('helpPopup').style.display='none'"
+    >
+        ✖
+    </span>
+
+    <h3>🎤 Voice Commands</h3>
+
+    <div><b>Inbox:</b> open inbox</div>
+
+    <div><b>Sent:</b> open sent</div>
+
+    <div><b>Trash:</b> open trash</div>
+
+    <div><b>Read:</b> read email 1</div>
+
+    <div><b>Delete:</b> delete email 1</div>
+
+    <div><b>Summary:</b> summary email 1</div>
+
+    <div><b>Reply:</b> suggest reply 1</div>
+
+    <div><b>Help:</b> help</div>
+    <div><b>Compose :</b> compose email</div>
+
+    <div><b>Telegram:</b> telegram</div>
+    <div><b>Search:</b> search linkedin</div>
+
+
+</div>
+
+<!-- ONLY THIS SCRIPT -->
+
+<script src="/static/js/dashboard.js"></script>
+
+</body>
+
+</html>

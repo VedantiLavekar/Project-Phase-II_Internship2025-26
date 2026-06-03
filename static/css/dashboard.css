@@ -1,0 +1,314 @@
+/* ---------- GLOBAL ---------- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Segoe UI", system-ui, sans-serif;
+}
+
+body {
+    background: linear-gradient(135deg, #050b1a, #020617);
+    color: #e5e7eb;
+}
+
+/* ---------- LAYOUT ---------- */
+.dashboard-container {
+    display: flex;
+    height: 100vh;
+    padding: 20px;
+    gap: 20px;
+}
+
+/* ---------- SIDEBAR ---------- */
+.sidebar {
+    width: 240px;
+    background: rgba(15, 23, 42, 0.9);
+    border-radius: 14px;
+    padding: 24px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.sidebar h2 {
+    font-size: 20px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.sidebar button {
+    background: #0f172a;
+    color: #e5e7eb;
+    border: none;
+    padding: 12px;
+    border-radius: 10px;
+    font-size: 15px;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+}
+
+.sidebar button:hover {
+    background: #2563eb;
+    transform: translateX(3px);
+}
+
+/* ---------- MAIN CONTENT ---------- */
+.main-content {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 20px;
+}
+
+/* ---------- VOICE CARD ---------- */
+.voice-card {
+    background: rgba(15, 23, 42, 0.9);
+    border-radius: 16px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.voice-card h3 {
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* ---------- BUTTONS ---------- */
+.voice-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.voice-actions button {
+    flex: 1;
+    padding: 12px;
+    border-radius: 10px;
+    font-size: 15px;
+    cursor: pointer;
+    border: none;
+}
+
+#startListening {
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    color: #022c22;
+    font-weight: 600;
+}
+
+#stopListening {
+    background: #1f2937;
+    color: #9ca3af;
+}
+
+#stopListening:disabled {
+    opacity: 0.5;
+}
+
+/* ---------- TEXT BOXES ---------- */
+.box {
+    background: #020617;
+    border: 1px solid #1e293b;
+    border-radius: 12px;
+    padding: 14px;
+    min-height: 80px;
+}
+
+.box strong {
+    display: block;
+    color: #38bdf8;
+    margin-bottom: 6px;
+}
+
+/* ---------- SPEAK BUTTON ---------- */
+.speak-btn {
+    margin-top: auto;
+    padding: 12px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #38bdf8, #2563eb);
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+/* ---------- CONTENT PANEL ---------- */
+.content-panel {
+    background: rgba(15, 23, 42, 0.9);
+    border-radius: 16px;
+    padding: 24px;
+}
+
+.content-panel h3 {
+    font-size: 20px;
+    margin-bottom: 12px;
+}
+
+/* ---------- EMPTY STATE ---------- */
+.empty-state {
+    color: #94a3b8;
+    font-size: 15px;
+    margin-top: 20px;
+}
+#voiceStatus {
+    font-weight: bold;
+    color: #22c55e;
+}
+
+.voice-card:hover,
+.content-panel:hover {
+    box-shadow: 0 0 18px rgba(56,189,248,0.15);
+}
+
+
+
+
+
+
+
+
+
+/* ================= GMAIL STYLE UPGRADE ================= */
+
+/* Layout spacing like Gmail */
+.dashboard-container {
+    padding: 10px;
+    gap: 10px;
+}
+
+/* Sidebar Gmail style */
+.sidebar {
+    background: #0b1220;
+    border-radius: 0;
+    border-right: 1px solid #1e293b;
+}
+
+/* Compose button effect */
+.sidebar button:nth-child(2) {
+    background: #c2e7ff;
+    color: black;
+    border-radius: 20px;
+    font-weight: 600;
+}
+
+/* Sidebar hover like Gmail */
+.sidebar button:hover {
+    background: #1e293b;
+    transform: none;
+}
+
+/* ================= MAIN CONTENT FULL WIDTH ================= */
+.main-content {
+    grid-template-columns: 300px 1fr;
+}
+
+/* ================= VOICE CARD (assistant panel style) ================= */
+.voice-card {
+    border-radius: 12px;
+    background: #020617;
+    border: 1px solid #1e293b;
+}
+
+/* ================= CONTENT PANEL (EMAIL AREA) ================= */
+.content-panel {
+    background: #020617;
+    border-radius: 0;
+    padding: 0;
+    border-left: 1px solid #1e293b;
+}
+
+/* Header like Gmail */
+#sectionTitle {
+    padding: 15px 20px;
+    font-size: 18px;
+    border-bottom: 1px solid #1e293b;
+}
+
+/* ================= EMAIL LIST ================= */
+
+/* Each email row */
+.email-item {
+    display: flex;
+    flex-direction: column;
+    padding: 12px 20px;
+    border-bottom: 1px solid #1e293b;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+/* Gmail hover */
+.email-item:hover {
+    background: #0f172a;
+}
+
+/* Subject bold */
+.email-item b {
+    font-size: 14px;
+    color: #e5e7eb;
+}
+
+/* Sender text */
+.email-item small {
+    font-size: 12px;
+    color: #94a3b8;
+}
+
+/* Add spacing like Gmail */
+.email-item br {
+    display: none;
+}
+
+/* Add preview style */
+.email-item::after {
+    content: "Click to read";
+    font-size: 11px;
+    color: #64748b;
+    margin-top: 4px;
+}
+
+/* ================= TELEGRAM STYLE MATCH ================= */
+#telegramBox .email-item {
+    background: #020617;
+    border: 1px solid #1e293b;
+    margin-bottom: 10px;
+    border-radius: 10px;
+}
+
+/* ================= SCROLLBAR ================= */
+.content-panel::-webkit-scrollbar {
+    width: 6px;
+}
+
+.content-panel::-webkit-scrollbar-thumb {
+    background: #1e293b;
+    border-radius: 10px;
+}
+
+/* ================= ACTIVE EMAIL (when clicked later) ================= */
+.email-item.active {
+    background: #1e293b;
+    border-left: 3px solid #38bdf8;
+}
+
+/* ================= GMAIL TOP BAR FEEL ================= */
+.main-content::before {
+    content: "🔍 Search in emails";
+    grid-column: span 2;
+    padding: 12px 20px;
+    background: #0f172a;
+    border-radius: 30px;
+    margin-bottom: 10px;
+    color: #64748b;
+}
+
+
+
+
+
+
+
+

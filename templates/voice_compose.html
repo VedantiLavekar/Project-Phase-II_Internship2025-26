@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Voice Guided Email Composer</title>
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #f4f6fb;
+  padding: 40px;
+}
+.container {
+  max-width: 800px;
+  margin: auto;
+  background: #fff;
+  padding: 30px;
+  border-radius: 10px;
+}
+input, textarea {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 15px;
+  font-size: 16px;
+}
+textarea {
+  height: 120px;
+}
+.status {
+  font-weight: bold;
+  margin-top: 20px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <h2>🎤 Voice Guided Email Composer</h2>
+
+  <input id="to" placeholder="Recipient Email">
+  <input id="subject" placeholder="Subject">
+  <textarea id="body" placeholder="Message"></textarea>
+
+  <div class="status" id="status"></div>
+</div>
+
+<script>
+
+/* ================= SPEAK ================= */
+
+function speak(text, afterSpeak) {
+
+  speechSynthesis.cancel();
+
+  const utter = new SpeechSynthesisUtterance(text);
+
+  utter.lang = "en-IN";
+
+  utter.onend = () => {
+
+    if (afterSpeak) afterSpeak();
+
+  };
+
+  speechSynthesis.speak(utter);
+
+  document.getElementById("status").innerText = text;
+}
+
+/* ================= RECOGNITION ================= */
+
+const SpeechRecognition =
+  window.SpeechRecognition || window.webkitSpeechRecognition;
+
+const recognition = new SpeechRecognition();
+
+recognition.lang = "en-IN";
+
+recognition.continuous = false;
+
+recognition.interimResults = false;
+
+/* ================= STATE ================= */
+
+let step = "to";
+
+let mail = {
+
+  to: "",
+  subject: "",
+  body: ""
+
+};
+
+/* ================= START LISTENING ================= */
+
+function listen() {
+
+  recognition.start();
+
+}
+
+/* ================= HANDLE SPEECH ================= */
+
+recognition.onresult = async (event) => {
+
+  let text = event.results[0][0].transcript
+    .toLowerCase()
+    .trim();
+
+  document.getElementById("status").innerText =
+    "You said: " + text;
+
+  /* ================= CANCEL ANYTIME ================= */
+
+  if (text.includes("cancel")) {
+
+    recognition.stop();
+
+    speak(
+      "Email cancelled. Returning to dashboard",
+      () => {
+
+        window.location.href = "/dashboard";
+
+      }
+    );
+
+    step = "done";
+
+    return;
+  }
+
+  /* ================= RECIPIENT ================= */
+
+  if (step === "to") {
+
+    mail.to = text
+      .replace(" at ", "@")
+      .replace(" dot ", ".")
+      .replace(/\s/g, "");
+
+    document.getElementById("to").value =
+      mail.to;
+
+    step = "subject";
+
+    speak(
+      "Please tell the subject",
+      listen
+    );
+
+    return;
+  }
+
+  /* ================= SUBJECT ================= */
+
+  if (step === "subject") {
+
+    mail.subject = text;
+
+    document.getElementById("subject").value =
+      mail.subject;
+
+    step = "body";
+
+    speak(
+      "Please tell the message",
+      listen
+    );
+
+    return;
+  }
+
+  /* ================= BODY ================= */
+
+  if (step === "body") {
+
+    mail.body = text;
+
+    document.getElementById("body").value =
+      mail.body;
+
+    step = "confirm";
+
+    speak(
+      "Can I send the email? Say yes or cancel",
+      listen
+    );
+
+    return;
+  }
+
+  /* ================= CONFIRM ================= */
+
+  if (step === "confirm") {
+
+    recognition.stop();
+
+    if (
+
+      text.includes("yes")
+
+      ||
+
+      text.includes("send")
+
+    ) {
+
+      document.getElementById("status").innerText =
+        "Sending email...";
+
+      try {
+
+        await fetch("/api/compose", {
+
+          method: "POST",
+
+          headers: {
+
+            "Content-Type": "application/json"
+
+          },
+
+          body: JSON.stringify(mail)
+
+        });
+
+        speak(
+
+          "Email sent successfully",
+
+          () => {
+
+            window.location.href =
+              "/dashboard?open=sent";
+
+          }
+
+        );
+
+      } catch (e) {
+
+        speak(
+          "Failed to send email"
+        );
+
+      }
+
+      step = "done";
+
+    } else {
+
+      speak(
+        "Email cancelled",
+        () => {
+
+          window.location.href =
+            "/dashboard";
+
+        }
+      );
+
+      step = "done";
+    }
+  }
+};
+
+/* ================= AUTO RESTART ================= */
+
+recognition.onerror = () => {
+
+  if (step !== "done") {
+
+    setTimeout(() => {
+
+      listen();
+
+    }, 1000);
+
+  }
+};
+
+/* ================= START FLOW ================= */
+
+window.onload = () => {
+
+  speak(
+
+    "Compose email started. Please tell recipient email",
+
+    listen
+
+  );
+};
+
+</script>
+
+</body>
+</html>

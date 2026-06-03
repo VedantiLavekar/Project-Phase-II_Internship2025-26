@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+
+<body>
+
+<!-- HEADER -->
+
+
+<div class="main-container">
+
+    <!-- LEFT SIDE -->
+    <div class="left">
+        <img src="/static/image.png" alt="Gmail UI">
+    </div>
+
+    <!-- RIGHT SIDE -->
+    <div class="right">
+        <div class="card">
+
+            <!-- Assistant -->
+            <div class="assistant">🤖</div>
+
+            <!-- Quote Section -->
+            <div class="quote-box">
+                <p class="quote">“Technology should make life easier, not harder.”</p>
+                <p class="quote">“Speak. Connect. Communicate.”</p>
+                <p class="quote">“Your voice is your power.”</p>
+            </div>
+
+            <!-- Hidden Buttons -->
+            <div style="display:none;">
+                <button onclick="goLogin()">Login</button>
+                <button onclick="goRegister()">Register</button>
+            </div>
+
+            <!-- Hint -->
+            <p class="hint">
+                🎙️ Say <b>"Login"</b> or <b>"Register"</b>
+            </p>
+
+        </div>
+    </div>
+
+</div>
+
+<script src="{{ url_for('static', filename='js/voice-nav.js') }}"></script>
+
+</body>
+</html>

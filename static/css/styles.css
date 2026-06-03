@@ -1,0 +1,94 @@
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+
+    background-image: url('/static/image.png');
+    background-size: cover;        /* Full screen fit */
+    background-position: center;   /* Center image */
+    background-repeat: no-repeat;  /* No repeat */
+    background-attachment: fixed;  /* Smooth effect */
+
+    min-height: 100vh;
+}
+
+
+/* ===== MAIN LAYOUT ===== */
+.main-container {
+    display: flex;
+    height: 100vh;
+}
+
+/* ===== LEFT SIDE ===== */
+.left {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* 🔥 ZOOM OUT IMAGE */
+.left img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;   /* fills entire space */
+}
+/* ===== RIGHT SIDE ===== */
+.right {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* ===== CARD ===== */
+.card {
+    background: white;
+    padding: 35px;
+    width: 320px;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+/* ===== ASSISTANT ===== */
+.assistant {
+    font-size: 55px;
+    margin-bottom: 10px;
+}
+
+/* ===== QUOTES ===== */
+.quote-box {
+    margin: 15px 0;
+}
+
+.quote {
+    font-size: 14px;
+    color: #444;
+    margin: 6px 0;
+    font-style: italic;
+}
+
+/* ===== HINT ===== */
+.hint {
+    font-size: 15px;
+    margin-top: 10px;
+    color: #333;
+}
+
+/* ===== HIDE BUTTONS ===== */
+button {
+    display: none !important;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+    .main-container {
+        flex-direction: column;
+    }
+
+    
+    .card {
+        margin-top: 20px;
+    }
+}
