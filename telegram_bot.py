@@ -8,7 +8,7 @@ from ai.reply_generator import generate_reply
 
 # ================= CONFIG =================
 
-BOT_TOKEN = "8386672558:AAEePUYseuV7SftQkw50VYhtQY2gsH_f5Ks"
+BOT_TOKEN = "YOUR_TELEGRAM_BOT_TOKEN"
 
 BASE_URL = f"https://api.telegram.org/bot{BOT_TOKEN}"
 
